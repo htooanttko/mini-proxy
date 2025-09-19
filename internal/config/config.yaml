@@ -1,0 +1,12 @@
+
+ListenAddr: ":8081"
+TLSCertFile: "yaml_cert.pem"
+TLSKeyFile: "yaml_key.pem"
+BalancerType: "round_robin"
+Backends:
+  - URL: "http://yaml_backend1:3000"
+    Weight: 1
+    MaxConnections: 50
+  - URL: "http://yaml_backend2:3000"
+    Weight: 3
+    MaxConnections: 150

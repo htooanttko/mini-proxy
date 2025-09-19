@@ -1,0 +1,13 @@
+{
+  "ListenAddr": ":9090",
+  "TLSCertFile": "test_cert.pem",
+  "TLSKeyFile": "test_key.pem",
+  "BalancerType": "least_conn",
+  "Backends": [
+    {"URL": "http://test_backend1:3000", "Weight": 1, "MaxConnections": 50},
+    {"URL": "http://test_backend2:3000", "Weight": 2, "MaxConnections": 100}
+  ],
+  "HealthCheck": {
+    "Interval": "10s"
+  }
+}
