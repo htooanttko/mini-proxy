@@ -1,6 +1,7 @@
 package balancer
 
 import (
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -25,6 +26,8 @@ func NewHealthChecker(bal Balancer, interval time.Duration) *HealthChecker {
 		ticker:    time.NewTicker(interval),
 		done:      make(chan struct{}),
 	}
+	hc.checkAll()
+
 	go hc.runCheckLoop()
 	return hc
 }
@@ -45,17 +48,33 @@ func (hc *HealthChecker) checkAll() {
 	hc.mu.Lock()
 	defer hc.mu.Unlock()
 	for _, bal := range hc.balancers {
-		// Refactor type assertion to ensure compatibility with `Balancer` interface.
-		if base, ok := bal.(*baseBalancer); ok {
-			for _, be := range base.backendsList {
-				resp, err := http.Get(be.URL + "/health")
-				if err != nil {
-					be.Healthy = false
-				} else {
-					resp.Body.Close()
-					be.Healthy = true
-				}
+		switch b := bal.(type) {
+		case *RoundRobin:
+			hc.checkBackend(b.baseBalancer)
+		case *LeastConnections:
+			hc.checkBackend(b.baseBalancer)
+		case *IPHash:
+			hc.checkBackend(b.baseBalancer)
+		case *Weighted:
+			hc.checkBackend(b.baseBalancer)
+		default:
+			log.Printf("Balancer type %T does not support health checks", bal)
+		}
+	}
+}
+
+func (hc *HealthChecker) checkBackend(base *baseBalancer) {
+	for _, be := range base.backendsList {
+		resp, err := http.Get(be.URL + "/health")
+		if err != nil {
+			be.Healthy = false
+		} else {
+			if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+				be.Healthy = true
+			} else {
+				be.Healthy = false
 			}
+			resp.Body.Close()
 		}
 	}
 }

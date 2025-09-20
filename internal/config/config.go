@@ -2,16 +2,30 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 	"time"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/dev-hak/mini-proxy/pkg/models"
 )
+
+type Duration time.Duration
+
+func (d *Duration) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	dur, err := time.ParseDuration(s)
+	if err != nil {
+		return errors.New("invalid duration format")
+	}
+	*d = Duration(dur)
+	return nil
+}
 
 type Config struct {
 	ListenAddr   string
@@ -32,12 +46,12 @@ type SecurityConfig struct {
 
 type RateLimitConfig struct {
 	RequestsPerMin int
-	BlockedTime    time.Duration
+	BlockedTime    Duration
 }
 
 type CacheConfig struct {
-	DefaultExpiration time.Duration
-	CleanupInterval   time.Duration
+	DefaultExpiration Duration
+	CleanupInterval   Duration
 }
 
 var DefaultConfig = Config{
@@ -50,16 +64,18 @@ var DefaultConfig = Config{
 		{URL: "http://backend2:3000", Weight: 2, MaxConnections: 100},
 	},
 	HealthCheck: models.HealthCheckConfig{
-		Interval: time.Second * 30,
+		Interval: models.Duration(30 * time.Second),
+		Timeout:  models.Duration(5 * time.Second),
+		Path:     "/health",
 	},
 	Cache: CacheConfig{
-		DefaultExpiration: time.Minute * 5,
-		CleanupInterval:   time.Minute,
+		DefaultExpiration: Duration(5 * time.Minute),
+		CleanupInterval:   Duration(1 * time.Minute),
 	},
 }
 
 func LoadConfig() *Config {
-	// Check for config.json or config.yaml
+	// Check for config.json
 	if _, err := os.Stat("config.json"); err == nil {
 		file, err := os.Open("config.json")
 		if err != nil {
@@ -70,18 +86,6 @@ func LoadConfig() *Config {
 		var cfg Config
 		if err := decoder.Decode(&cfg); err != nil {
 			log.Fatalf("Failed to parse config.json: %v", err)
-		}
-		return &cfg
-	} else if _, err := os.Stat("config.yaml"); err == nil {
-		file, err := os.Open("config.yaml")
-		if err != nil {
-			log.Fatalf("Failed to open config.yaml: %v", err)
-		}
-		defer file.Close()
-		decoder := yaml.NewDecoder(file)
-		var cfg Config
-		if err := decoder.Decode(&cfg); err != nil {
-			log.Fatalf("Failed to parse config.yaml: %v", err)
 		}
 		return &cfg
 	}
@@ -100,13 +104,6 @@ func LoadConfigWithPath(path string) *Config {
 
 	if strings.HasSuffix(path, ".json") {
 		decoder := json.NewDecoder(file)
-		var cfg Config
-		if err := decoder.Decode(&cfg); err != nil {
-			log.Fatalf("Failed to parse %s: %v", path, err)
-		}
-		return &cfg
-	} else if strings.HasSuffix(path, ".yaml") {
-		decoder := yaml.NewDecoder(file)
 		var cfg Config
 		if err := decoder.Decode(&cfg); err != nil {
 			log.Fatalf("Failed to parse %s: %v", path, err)

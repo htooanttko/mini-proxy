@@ -18,6 +18,7 @@ func NewReverseProxy(bal balancer.Balancer, hc *balancer.HealthChecker) *Reverse
 }
 
 func (rp *ReverseProxy) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
 	be := rp.balancer.NextBackend(req)
 	if be == nil {
 		http.Error(w, "No healthy backend", http.StatusServiceUnavailable)

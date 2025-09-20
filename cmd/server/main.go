@@ -3,13 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/dev-hak/mini-proxy/internal/balancer"
 	"github.com/dev-hak/mini-proxy/internal/config"
-	"github.com/dev-hak/mini-proxy/internal/networking"
-
-	forward_proxy "github.com/dev-hak/mini-proxy/internal/proxy/forward"
-	reverse_proxy "github.com/dev-hak/mini-proxy/internal/proxy/reverse"
+	"github.com/dev-hak/mini-proxy/internal/proxy/caching"
+	"github.com/dev-hak/mini-proxy/internal/proxy/compression"
+	"github.com/dev-hak/mini-proxy/internal/proxy/forward"
+	"github.com/dev-hak/mini-proxy/internal/proxy/reverse"
+	"github.com/dev-hak/mini-proxy/internal/proxy/security"
 	"github.com/dev-hak/mini-proxy/internal/proxy/ssl"
 	"github.com/dev-hak/mini-proxy/pkg/models"
 )
@@ -25,23 +27,32 @@ func main() {
 		backends[i] = &cfg.Backends[i]
 	}
 	bal := balancer.NewBalancer(backends, cfg.BalancerType)
-	hc := balancer.NewHealthChecker(bal, cfg.HealthCheck.Interval)
+
+	interval := time.Duration(cfg.HealthCheck.Interval)
+	if interval <= 0 {
+		log.Fatalf("Health check interval must be positive, got: %v", interval)
+	}
+	hc := balancer.NewHealthChecker(bal, interval)
 
 	var handler http.Handler
 	if cfg.ProxyType == "reverse" {
-		rp := reverse_proxy.NewReverseProxy(bal, hc)
-		handler = networking.ProxyHandler(rp)
+		rp := reverse.NewReverseProxy(bal, hc)
+		handler = http.HandlerFunc(rp.ServeHTTP)
 	} else {
-		// Forward proxy handler
-		handler = http.HandlerFunc(forward_proxy.NewForwardProxy().ServeHTTP)
+		handler = http.HandlerFunc(forward.NewForwardProxy().ServeHTTP)
 	}
+
+	// Add middleware directly
+	handler = security.NewRateLimiter(cfg.Security.RateLimit.RequestsPerMin).Middleware(handler)
+	handler = security.NewAuth(cfg.Security.BasicAuthUsers).Middleware(handler)
+	handler = caching.NewCache(time.Duration(cfg.Cache.DefaultExpiration), time.Duration(cfg.Cache.CleanupInterval)).Middleware(handler)
+	handler = compression.NewCompressor().Middleware(handler)
 
 	// Middleware already in listener, but for SSL
 	sslTerm := ssl.NewSSLTerminator(cfg.TLSCertFile, cfg.TLSKeyFile, handler)
 
-	listener := networking.NewListener(cfg)
 	log.Printf("Starting server on %s", cfg.ListenAddr)
-	if err := listener.ListenAndServe(http.HandlerFunc(sslTerm.ServeHTTP)); err != nil {
+	if err := sslTerm.ListenAndServe(cfg.ListenAddr); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
 

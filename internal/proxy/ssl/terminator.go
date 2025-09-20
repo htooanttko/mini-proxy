@@ -12,14 +12,15 @@ type SSLTerminator struct {
 }
 
 func NewSSLTerminator(cert, key string, h http.Handler) *SSLTerminator {
-	if cert == "" || key == "" {
-		log.Fatalf("Invalid SSL configuration: cert=%s, key=%s", cert, key)
-	}
 	return &SSLTerminator{certFile: cert, keyFile: key, handler: h}
 }
 
-func (s *SSLTerminator) ListenAndServeTLS(addr string) error {
-	// In prod, load certs properly
+func (s *SSLTerminator) ListenAndServe(addr string) error {
+	if s.certFile == "" || s.keyFile == "" {
+		log.Println("SSL not configured, falling back to HTTP")
+		return http.ListenAndServe(addr, s.handler)
+	}
+	log.Println("Starting HTTPS server")
 	return http.ListenAndServeTLS(addr, s.certFile, s.keyFile, s.handler)
 }
 

@@ -1,6 +1,7 @@
 package balancer
 
 import (
+	"log"
 	"net/http"
 	"sync"
 
@@ -39,10 +40,31 @@ func (b *baseBalancer) backends() []*models.Backend {
 }
 
 func (b *baseBalancer) NextBackend(req *http.Request) *models.Backend {
-	// Placeholder implementation
-	return nil
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	log.Printf("Selecting backend from list: %v", b.backendsList)
+	// Example: Round-robin logic
+	if len(b.backendsList) == 0 {
+		return nil
+	}
+	backend := b.backendsList[0]
+	b.backendsList = append(b.backendsList[1:], backend)
+	return backend
 }
 
 func (b *baseBalancer) UpdateHealth(backend *models.Backend, healthy bool) {
-	// Placeholder implementation
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	for i, existingBackend := range b.backendsList {
+		if existingBackend.URL == backend.URL {
+			existingBackend.Healthy = healthy
+			if !healthy {
+				// Remove unhealthy backend
+				b.backendsList = append(b.backendsList[:i], b.backendsList[i+1:]...)
+			}
+			break
+		}
+	}
 }
