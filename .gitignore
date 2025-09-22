@@ -1,0 +1,9 @@
+# Ignore build artifacts and distribution files
+/mini-proxy
+/.mini-proxy
+mini-proxy
+mini-proxy.bin
+
+# Ignore OS-specific files
+/dist
+.DS_Store
