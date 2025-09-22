@@ -32,7 +32,7 @@ func main() {
 	if interval <= 0 {
 		log.Fatalf("Health check interval must be positive, got: %v", interval)
 	}
-	hc := balancer.NewHealthChecker(bal, interval)
+	hc := balancer.NewHealthChecker(bal, interval, cfg.HealthCheck.Path)
 
 	var handler http.Handler
 	if cfg.ProxyType == "reverse" {
@@ -46,7 +46,8 @@ func main() {
 	handler = security.NewRateLimiter(cfg.Security.RateLimit.RequestsPerMin).Middleware(handler)
 	handler = security.NewAuth(cfg.Security.BasicAuthUsers).Middleware(handler)
 	handler = caching.NewCache(time.Duration(cfg.Cache.DefaultExpiration), time.Duration(cfg.Cache.CleanupInterval)).Middleware(handler)
-	handler = compression.NewCompressor().Middleware(handler)
+
+	handler = compression.Middleware(handler)
 
 	// Middleware already in listener, but for SSL
 	sslTerm := ssl.NewSSLTerminator(cfg.TLSCertFile, cfg.TLSKeyFile, handler)

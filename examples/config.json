@@ -1,0 +1,38 @@
+{
+  "listen_addr": ":9091",
+  "proxy_type": "reverse",
+  "tls_cert_file": "test_cert.pem",
+  "tls_key_file": "test_key.pem",
+  "balancer_type": "round_robin",
+  "backends": [
+    {
+      "name": "backend1",
+      "url": "http://127.0.0.1:3001",
+      "weight": 1
+    },
+    {
+      "name": "backend2",
+      "url": "http://127.0.0.1:3002",
+      "weight": 2
+    }
+  ],
+  "health_check": {
+    "path": "/healthz",
+    "interval": "10s",
+    "timeout": "2s"
+  },
+  "security": {
+    "basic_auth_users": {
+      "admin": "password123",
+      "user": "userpass"
+    },
+    "rate_limit": {
+      "requests_per_min": 60,
+      "blocked_time": "300s"
+    }
+  },
+  "cache": {
+    "default_expiration": "10m",
+    "cleanup_interval": "30m"
+  }
+}

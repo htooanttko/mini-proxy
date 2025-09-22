@@ -1,6 +1,7 @@
 package security
 
 import (
+	"encoding/base64"
 	"net/http"
 	"strings"
 )
@@ -25,16 +26,23 @@ func (a *Auth) Middleware(next http.Handler) http.Handler {
 			http.Error(w, "Invalid auth", http.StatusUnauthorized)
 			return
 		}
-		// Decode base64 (simplified, use proper b64 in prod)
-		payload := strings.TrimPrefix(auth, "Basic ")
-		// Assume payload is "user:pass" base64 encoded
-		// In prod, use golang.org/x/crypto/bcrypt or similar
-		for u, p := range a.users {
-			if payload == u+":"+p { // Raw for simplicity
-				next.ServeHTTP(w, r)
-				return
-			}
+		// Decode base64
+		payload, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(auth, "Basic "))
+		if err != nil {
+			http.Error(w, "Invalid auth", http.StatusUnauthorized)
+			return
 		}
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		// Split on colon
+		pair := strings.SplitN(string(payload), ":", 2)
+		if len(pair) != 2 {
+			http.Error(w, "Invalid auth", http.StatusUnauthorized)
+			return
+		}
+		// Validate user:pass
+		if a.users[pair[0]] != pair[1] {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }

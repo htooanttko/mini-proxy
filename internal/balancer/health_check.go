@@ -10,6 +10,7 @@ import (
 type HealthChecker struct {
 	balancers []Balancer
 	interval  time.Duration
+	path      string
 	ticker    *time.Ticker
 	done      chan struct{}
 	mu        sync.Mutex
@@ -19,10 +20,11 @@ func (hc *HealthChecker) Interval() time.Duration {
 	return hc.interval
 }
 
-func NewHealthChecker(bal Balancer, interval time.Duration) *HealthChecker {
+func NewHealthChecker(bal Balancer, interval time.Duration, path string) *HealthChecker {
 	hc := &HealthChecker{
 		balancers: []Balancer{bal},
 		interval:  interval,
+		path:      path,
 		ticker:    time.NewTicker(interval),
 		done:      make(chan struct{}),
 	}
@@ -65,7 +67,7 @@ func (hc *HealthChecker) checkAll() {
 
 func (hc *HealthChecker) checkBackend(base *baseBalancer) {
 	for _, be := range base.backendsList {
-		resp, err := http.Get(be.URL + "/health")
+		resp, err := http.Get(be.URL + hc.path)
 		if err != nil {
 			be.Healthy = false
 		} else {
