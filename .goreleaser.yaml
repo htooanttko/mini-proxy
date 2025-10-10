@@ -1,7 +1,7 @@
 project_name: mini-proxy
 
 builds:
-  - main: ./cmd/mini-proxy
+  - main: ./cmd/server
     binary: mini-proxy
     goos:
       - linux
