@@ -1,4 +1,4 @@
-module github.com/dev-hak/mini-proxy
+module github.com/htooanttko/mini-proxy
 
 go 1.24.5
 

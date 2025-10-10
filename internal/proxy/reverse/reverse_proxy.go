@@ -5,7 +5,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/dev-hak/mini-proxy/internal/balancer"
+	"github.com/htooanttko/mini-proxy/internal/balancer"
 )
 
 type ReverseProxy struct {

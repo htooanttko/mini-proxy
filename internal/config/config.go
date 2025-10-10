@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/dev-hak/mini-proxy/pkg/models"
+	"github.com/htooanttko/mini-proxy/pkg/models"
 )
 
 type Duration time.Duration

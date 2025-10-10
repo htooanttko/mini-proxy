@@ -5,15 +5,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dev-hak/mini-proxy/internal/balancer"
-	"github.com/dev-hak/mini-proxy/internal/config"
-	"github.com/dev-hak/mini-proxy/internal/proxy/caching"
-	"github.com/dev-hak/mini-proxy/internal/proxy/compression"
-	"github.com/dev-hak/mini-proxy/internal/proxy/forward"
-	"github.com/dev-hak/mini-proxy/internal/proxy/reverse"
-	"github.com/dev-hak/mini-proxy/internal/proxy/security"
-	"github.com/dev-hak/mini-proxy/internal/proxy/ssl"
-	"github.com/dev-hak/mini-proxy/pkg/models"
+	"github.com/htooanttko/mini-proxy/internal/balancer"
+	"github.com/htooanttko/mini-proxy/internal/config"
+	"github.com/htooanttko/mini-proxy/internal/proxy/caching"
+	"github.com/htooanttko/mini-proxy/internal/proxy/compression"
+	"github.com/htooanttko/mini-proxy/internal/proxy/forward"
+	"github.com/htooanttko/mini-proxy/internal/proxy/reverse"
+	"github.com/htooanttko/mini-proxy/internal/proxy/security"
+	"github.com/htooanttko/mini-proxy/internal/proxy/ssl"
+	"github.com/htooanttko/mini-proxy/pkg/models"
 )
 
 func main() {

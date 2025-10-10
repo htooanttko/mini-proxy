@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/dev-hak/mini-proxy/pkg/models"
+	"github.com/htooanttko/mini-proxy/pkg/models"
 )
 
 type Balancer interface {

@@ -9,14 +9,14 @@ A production-like Go-based load balancer and proxy server.
 To install the `mini-proxy` tool directly using Go, run the following command:
 
 ```bash
-go install github.com/dev-hak/mini-proxy/cmd/mini-proxy@latest
+go install github.com/htooanttko/mini-proxy/cmd/mini-proxy@latest
 ```
 
 ### macOS
 Download and install `mini-proxy` for AMD64 using cURL:
 
 ```bash
-curl -sL https://github.com/dev-hak/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_macOS_.amd64.tar.gz \
+curl -sL https://github.com/htooanttko/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_macOS_.amd64.tar.gz \
   | tar xz
 sudo mv mini-proxy /usr/local/bin/
 ```
@@ -24,7 +24,7 @@ sudo mv mini-proxy /usr/local/bin/
 Download and install `mini-proxy` for ARM64 using cURL:
 
 ```bash
-curl -sL https://github.com/dev-hak/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_macOS_.arm64.tar.gz \
+curl -sL https://github.com/htooanttko/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_macOS_.arm64.tar.gz \
   | tar xz
 sudo mv mini-proxy /usr/local/bin/
 ```
@@ -35,7 +35,7 @@ sudo mv mini-proxy /usr/local/bin/
 Install `mini-proxy` for AMD64 with PowerShell:
 
 ```powershell
-Invoke-WebRequest https://github.com/dev-hak/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Windows_.amd64.tar.gz -OutFile mini-proxy.zip
+Invoke-WebRequest https://github.com/htooanttko/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Windows_.amd64.tar.gz -OutFile mini-proxy.zip
 Expand-Archive mini-proxy.zip -DestinationPath .
 Move-Item mini-proxy.exe C:\Windows\System32\
 ```
@@ -43,7 +43,7 @@ Move-Item mini-proxy.exe C:\Windows\System32\
 Install `mini-proxy` for ARM64 with PowerShell:
 
 ```powershell
-Invoke-WebRequest https://github.com/dev-hak/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Windows_.arm64.tar.gz -OutFile mini-proxy.zip
+Invoke-WebRequest https://github.com/htooanttko/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Windows_.arm64.tar.gz -OutFile mini-proxy.zip
 Expand-Archive mini-proxy.zip -DestinationPath .
 Move-Item mini-proxy.exe C:\Windows\System32\
 ```
@@ -52,14 +52,14 @@ Move-Item mini-proxy.exe C:\Windows\System32\
 Download and install `mini-proxy` for AMD64 using cURL:
 
 ```bash
-curl -sL https://github.com/dev-hak/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Linux_.amd64.tar.gz \
+curl -sL https://github.com/htooanttko/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Linux_.amd64.tar.gz \
   | tar xz
 sudo mv mini-proxy /usr/local/bin/
 ```
 Download and install `mini-proxy` for ARM64 using cURL:
 
 ```bash
-curl -sL https://github.com/dev-hak/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Linux_.arm64.tar.gz \
+curl -sL https://github.com/htooanttko/mini-proxy/releases/download/v0.1.0/mini-proxy_0.1.0_Linux_.arm64.tar.gz \
   | tar xz
 sudo mv mini-proxy /usr/local/bin/
 ```
