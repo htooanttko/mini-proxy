@@ -27,7 +27,6 @@ func (w *Weighted) NextBackend(req *http.Request) *models.Backend {
 	if len(healthy) == 0 {
 		return nil
 	}
-	// Simple weighted selection (can be improved with reservoir sampling)
 	r := sort.Search(len(healthy), func(i int) bool {
 		sum := 0
 		for j := 0; j <= i; j++ {

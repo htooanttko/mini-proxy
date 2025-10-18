@@ -44,7 +44,7 @@ func (b *baseBalancer) NextBackend(req *http.Request) *models.Backend {
 	defer b.mu.Unlock()
 
 	log.Printf("Selecting backend from list: %v", b.backendsList)
-	// Example: Round-robin logic
+	// Example
 	if len(b.backendsList) == 0 {
 		return nil
 	}

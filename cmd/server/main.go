@@ -42,14 +42,14 @@ func main() {
 		handler = http.HandlerFunc(forward.NewForwardProxy().ServeHTTP)
 	}
 
-	// Add middleware directly
+	// Add middleware 
 	handler = security.NewRateLimiter(cfg.Security.RateLimit.RequestsPerMin).Middleware(handler)
 	handler = security.NewAuth(cfg.Security.BasicAuthUsers).Middleware(handler)
 	handler = caching.NewCache(time.Duration(cfg.Cache.DefaultExpiration), time.Duration(cfg.Cache.CleanupInterval)).Middleware(handler)
 
 	handler = compression.Middleware(handler)
 
-	// Middleware already in listener, but for SSL
+	// Middleware for SSL
 	sslTerm := ssl.NewSSLTerminator(cfg.TLSCertFile, cfg.TLSKeyFile, handler)
 
 	log.Printf("Starting server on %s", cfg.ListenAddr)

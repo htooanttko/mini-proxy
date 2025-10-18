@@ -29,9 +29,6 @@ func (rr *RoundRobin) NextBackend(req *http.Request) *models.Backend {
 	for _, be := range backends {
 		if be.Healthy {
 			healthy = append(healthy, be)
-			log.Printf("RoundRobin: Backend %s Weight: %d", be.URL, be.Weight)
-			log.Printf("RoundRobin: Backend %s CurrentConnections: %d", be.URL, be.CurrentConns)
-			log.Printf("RoundRobin: Backend %s MaxConnections: %d", be.URL, be.MaxConnections)
 		}
 	}
 	if len(healthy) == 0 {
